@@ -1,43 +1,73 @@
-import nltk
-import re
+#No terminal, antes de rodar o programa, digite os comandos abaixo...
+
+#pip install nltk
+#python
+#import nltk
+#nltk.download('stopwords')
+#nltk.download('punkt')
+
+
 from nltk import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords
 from string import punctuation
 from nltk.probability import FreqDist
-from collections import Counter, OrderedDict
+from heapq import nlargest
+from sys import stdin
 
-text = """Os governos de China e Argentina ampliaram neste domingo (2), em Buenos Aires, a sua associação estratégica com a assinatura de 30 acordos de comércio e investimentos, em uma cerimônia liderada pelos presidentes Xi Jinping e Mauricio Macri. <SENTENÇA 1>
+text = stdin.read()
 
-    “Fortalecemos a cooperação em matéria econômica, agrícola, de infraestrutura e financeira, entre outros campos. O objetivo é promover a longa amizade entre os dois povos”, disse Xi em um evento na residência presidencial argentina em Olivos, na periferia norte. <SENTENÇA 2>
+class Summarizer:
+    def __init__(self, text):
+        self.text = text
+        self.sents = sent_tokenize(text)
+        self.words = word_tokenize(self.text)
+        self.stops = stopwords.words('portuguese')
+        self.punctuation = list(punctuation)
+        self.stops.extend(punctuation)
+        self.words = list(filter(lambda word: word not in self.stops, self.words))
+        for i in range(len(self.words)):
+            self.words[i] = self.words[i].lower()
 
-    Além disso, Macri disse que a assinatura de uma declaração conjunta demonstra “o importante consenso alcançado em termos de desenvolvimento em longo prazo. Foi uma reunião muito produtiva”, detalhou. <SENTENÇA 3>
+        self.freq = self.normalize_freq(FreqDist(self.words))
 
-    Xi foi o único presidente estrangeiro a concluir uma visita de Estado ao país sul-americano, enquanto era realizada a cúpula do G20, que terminou neste sábado (dia 1º). <SENTENÇA 4>"""
+    def normalize_freq(self, freq):
+        for word in freq.keys():
+            freq[word] = freq[word]/max(FreqDist(self.words).values())
+        return freq
 
-sents = sent_tokenize(text)
+    def grade_sentence(self):
+        sent_scores = {}
+        for sentence in self.sents:
+            for word in sentence:
+                if word.lower() in self.freq.keys():
+                    if sentence not in sent_scores.keys():
+                        sent_scores[sentence] = self.freq[word.lower()]
+                    else:
+                        sent_scores[sentence] += self.freq[word.lower()]
+        return sent_scores
 
-words = word_tokenize(text)
+    def summary(self):
+        temp = int(len(self.sents)*0.3)
 
-stops = stopwords.words('portuguese')
+        selected_length = temp if temp >= 2 else 2
+        
+        sent_scores = self.grade_sentence()
 
-punctuation = list(punctuation)
+        temp_summary = nlargest(selected_length, sent_scores, key=sent_scores.get)
+        
+        final_summary = []
+        for sentence in self.sents:
+            if sentence in temp_summary:
+                final_summary.append(sentence)
 
-stops.extend(punctuation)
+        final_summary = ''.join(final_summary)
 
-words = list(filter(lambda word: word not in stops, words))
+        return final_summary
 
-freq = FreqDist(words)
 
-PATTERN = r"""\w+\-+\w+|\w+|['"]{1}"""
+x = Summarizer(text)
 
-def my_tokenizer(input_string):
-    return re.findall(PATTERN, input_string)
+print(x.summary())
+print(len(x.summary()))
 
-def token_counter(input_tokens):
-    return Counter(input_tokens)
-
-def ordered_counter(input_tokens):
-    tok = OrderedDict(Counter(input_tokens))
-    return OrderedDict(sorted(tok.items(), key=lambda x: x[1], reverse=True))
-
-print(ordered_counter(my_tokenizer(text)))
+print(len(text))
