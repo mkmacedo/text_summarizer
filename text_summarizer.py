@@ -1,15 +1,3 @@
-#No terminal, antes de rodar o programa, digite os comandos abaixo...
-
-#pip install nltk
-#python
-#import nltk
-#nltk.download('stopwords')
-#nltk.download('punkt')
-
-#Para rodar...
-#python3 text_summarizer.py < [filename.txt]
-
-
 from nltk import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords
 from string import punctuation
