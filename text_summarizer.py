@@ -18,7 +18,6 @@ class Summarizer:
         self.words = list(filter(lambda word: word not in self.stops, self.words))
         for i in range(len(self.words)):
             self.words[i] = self.words[i].lower()
-
         self.freq = self.normalize_freq(FreqDist(self.words))
 
     def normalize_freq(self, freq):
@@ -29,27 +28,34 @@ class Summarizer:
     def grade_sentence(self):
         sent_scores = {}
         for sentence in self.sents:
-            for word in sentence:
+     
+            split_sentence = sentence.split()
+            for word in split_sentence:
                 if word.lower() in self.freq.keys():
                     if sentence not in sent_scores.keys():
                         sent_scores[sentence] = self.freq[word.lower()]
                     else:
                         sent_scores[sentence] += self.freq[word.lower()]
+      
         return sent_scores
 
     def summary(self):
-        temp = int(len(self.sents)*0.3)
+        n_sentences = len(self.sents)
+        temp = int(n_sentences*0.3)
 
-        selected_length = temp if temp >= 2 else 2
-        
+        selected_length = temp if temp >= 2 else n_sentences
+         
         sent_scores = self.grade_sentence()
-
+       
         temp_summary = nlargest(selected_length, sent_scores, key=sent_scores.get)
         
         final_summary = []
         for sentence in self.sents:
-            if sentence in temp_summary:
-                final_summary.append(sentence)
+            if len(final_summary) < selected_length:
+                if sentence in temp_summary:
+                    final_summary.append(sentence)
+            else:
+                break
 
         final_summary = ''.join(final_summary)
 
