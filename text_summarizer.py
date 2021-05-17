@@ -6,6 +6,9 @@
 #nltk.download('stopwords')
 #nltk.download('punkt')
 
+#Para rodar...
+#python3 text_summarizer < [filename.txt]
+
 
 from nltk import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords
@@ -69,5 +72,4 @@ x = Summarizer(text)
 
 print(x.summary())
 print(len(x.summary()))
-
 print(len(text))
