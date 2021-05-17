@@ -7,7 +7,7 @@
 #nltk.download('punkt')
 
 #Para rodar...
-#python3 text_summarizer < [filename.txt]
+#python3 text_summarizer.py < [filename.txt]
 
 
 from nltk import sent_tokenize, word_tokenize
