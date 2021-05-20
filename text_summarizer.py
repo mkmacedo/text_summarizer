@@ -5,7 +5,7 @@ from nltk.probability import FreqDist
 from heapq import nlargest
 from sys import stdin
 
-text = stdin.read()
+#text = stdin.read()
 
 class Summarizer:
     def __init__(self, text):
@@ -62,8 +62,8 @@ class Summarizer:
         return final_summary
 
 
-x = Summarizer(text)
+#x = Summarizer(text)
 
-print(x.summary())
-print(len(x.summary()))
-print(len(text))
+#print(x.summary())
+#print(len(x.summary()))
+#print(len(text))
